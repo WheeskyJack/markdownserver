@@ -489,8 +489,10 @@ class MarkdownHandler(http.server.SimpleHTTPRequestHandler):
         """Save edited markdown content"""
         filepath = SCRIPT_DIR / filename
 
-        # Security check - ensure file is in SCRIPT_DIR
-        if not filepath.resolve().parent == SCRIPT_DIR.resolve():
+        # Security check - ensure file is within SCRIPT_DIR (including subdirectories)
+        try:
+            filepath.resolve().relative_to(SCRIPT_DIR.resolve())
+        except ValueError:
             self.send_error(403, "Access denied")
             return
 
